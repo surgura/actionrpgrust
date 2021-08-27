@@ -13,7 +13,7 @@ pub use render_target::RenderTarget;
 mod render_target_3dsprites;
 pub use render_target_3dsprites::RenderTarget3DSprites;
 
-use nalgebra::Vector2;
+use nalgebra::{Vector2, Vector3};
 
 fn main() {
     let (mut rl, thread) = raylib::init().size(640, 480).title("Hello, World").build();
@@ -32,5 +32,6 @@ fn main() {
         let camera_pos: Vector2<f32> = Vector2::new(320.0, 240.0);
         let mut sprites3d = RenderTarget3DSprites::new(&mut target, camera_pos);
         player.draw(&mut sprites3d);
+        sprites3d.draw_circle(Vector3::new(0.0, 0.0, 0.0), 64.0, Color::RED);
     }
 }

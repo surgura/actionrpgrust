@@ -38,6 +38,7 @@ impl<'a, 'b: 'a> RenderTarget3DSprites<'a, 'b> {
         for circle in &self.drawn_circles {
             let mut position_xy = circle.position.fixed_rows::<2>(0).into_owned();
             position_xy[1] = -position_xy[1];
+            position_xy[1] -= circle.position[2];
             position_xy += self.camera_pos;
             self.render_target
                 .draw_circle(position_xy, circle.radius, circle.color);

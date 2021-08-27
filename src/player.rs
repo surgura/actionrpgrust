@@ -28,6 +28,12 @@ impl Player {
         if input.is_key_down(KeyboardKey::KEY_D) {
             self.position[0] += 1.0;
         }
+        if input.is_key_down(KeyboardKey::KEY_R) {
+            self.position[2] += 1.0;
+        }
+        if input.is_key_down(KeyboardKey::KEY_F) {
+            self.position[2] -= 1.0;
+        }
     }
 
     pub fn draw(&self, target: &mut RenderTarget3DSprites) {
