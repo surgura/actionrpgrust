@@ -2,7 +2,7 @@ use nalgebra::Vector3;
 
 use super::color::Color;
 use super::input::*;
-use super::render_target::RenderTarget;
+use super::render_target_3dsprites::RenderTarget3DSprites;
 
 pub struct Player {
     position: Vector3<f32>,
@@ -30,9 +30,7 @@ impl Player {
         }
     }
 
-    pub fn draw(&self, target: &mut RenderTarget) {
-        let mut position_xy = self.position.fixed_rows::<2>(0).into_owned();
-        position_xy[1] = -position_xy[1];
-        target.draw_circle(position_xy, 128.0, Color::RED);
+    pub fn draw(&self, target: &mut RenderTarget3DSprites) {
+        target.draw_circle(self.position, 64.0, Color::PURPLE);
     }
 }
