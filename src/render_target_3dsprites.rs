@@ -1,9 +1,11 @@
 use super::color::Color;
 use super::render_target::RenderTarget;
+use super::shader::Shader;
 use nalgebra::{Vector2, Vector3};
 
-pub struct RenderTarget3DSprites<'a, 'b: 'a> {
-    render_target: &'a mut RenderTarget<'a, 'b>,
+pub struct RenderTarget3DSprites<'a, 'b, 'c> {
+    render_target: &'a mut RenderTarget<'b, 'c>,
+    shader: &'c mut Shader,
     camera_pos: Vector2<f32>,
     drawn_circles: Vec<DrawnCircle>,
 }
@@ -14,10 +16,15 @@ struct DrawnCircle {
     color: Color,
 }
 
-impl<'a, 'b: 'a> RenderTarget3DSprites<'a, 'b> {
-    pub fn new(render_target: &'a mut RenderTarget<'a, 'b>, camera_pos: Vector2<f32>) -> Self {
+impl<'a, 'b, 'c> RenderTarget3DSprites<'a, 'b, 'c> {
+    pub fn new(
+        render_target: &'a mut RenderTarget<'b, 'c>,
+        shader: &'c mut Shader,
+        camera_pos: Vector2<f32>,
+    ) -> Self {
         RenderTarget3DSprites {
             render_target,
+            shader,
             camera_pos,
             drawn_circles: Vec::new(),
         }
@@ -40,13 +47,19 @@ impl<'a, 'b: 'a> RenderTarget3DSprites<'a, 'b> {
             position_xy[1] = -position_xy[1];
             position_xy[1] -= circle.position[2];
             position_xy += self.camera_pos;
-            self.render_target
-                .draw_circle(position_xy, circle.radius, circle.color);
+            {
+                self.shader.raylib_shader.set_shader_value(
+                    0,
+                    [circle.position[0], circle.position[1], circle.position[2]],
+                );
+                let mut shadermode = self.render_target.begin_shader_mode(&self.shader);
+                shadermode.draw_circle(position_xy, circle.radius, circle.color);
+            }
         }
     }
 }
 
-impl<'a, 'b: 'a> Drop for RenderTarget3DSprites<'a, 'b> {
+impl<'a, 'b, 'c> Drop for RenderTarget3DSprites<'a, 'b, 'c> {
     fn drop(&mut self) {
         self.execute_prepared_draw_statements();
     }

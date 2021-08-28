@@ -11,7 +11,7 @@ pub struct Player {
 impl Player {
     pub fn new() -> Player {
         Player {
-            position: Vector3::new(0.0, 0.0, 0.0),
+            position: Vector3::new(100.0, 0.0, 0.0),
         }
     }
 
