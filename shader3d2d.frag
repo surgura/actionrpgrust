@@ -2,12 +2,13 @@
 
 layout(location = 0) uniform vec3 position;
 
+// defined by Raylib default vert shader
 in vec4 fragColor;
 
-out vec4 finalColor;
+layout(location = 0) out vec4 finalColor;
 
-void main()
+void main() 
 {
-    finalColor = vec4(position.xyz / 400.0,1);
-    //finalColor = fragColor;
+    finalColor = fragColor;
+    gl_FragDepth = 0.5 + (position.y - position.z) / 10000.0f;
 }

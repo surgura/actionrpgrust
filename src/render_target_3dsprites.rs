@@ -39,22 +39,23 @@ impl<'a, 'b, 'c> RenderTarget3DSprites<'a, 'b, 'c> {
     }
 
     fn execute_prepared_draw_statements(&mut self) {
-        let calc_z = |pos: Vector3<f32>| -pos[1] + pos[2];
-        self.drawn_circles
-            .sort_unstable_by(|a, b| calc_z(a.position).partial_cmp(&calc_z(b.position)).unwrap());
+        unsafe {
+            raylib::ffi::rlEnableDepthTest();
+            raylib::ffi::rlEnableDepthMask();
+        }
         for circle in &self.drawn_circles {
             let mut position_xy = circle.position.fixed_rows::<2>(0).into_owned();
+            position_xy[1] += circle.radius;
+            position_xy[1] += circle.position[2];
+            position_xy -= self.camera_pos;
             position_xy[1] = -position_xy[1];
-            position_xy[1] -= circle.position[2];
-            position_xy += self.camera_pos;
-            {
-                self.shader.raylib_shader.set_shader_value(
-                    0,
-                    [circle.position[0], circle.position[1], circle.position[2]],
-                );
-                let mut shadermode = self.render_target.begin_shader_mode(&self.shader);
-                shadermode.draw_circle(position_xy, circle.radius, circle.color);
-            }
+
+            self.shader.raylib_shader.set_shader_value(
+                0,
+                [circle.position[0], circle.position[1], circle.position[2]],
+            );
+            let mut shadermode = self.render_target.begin_shader_mode(&self.shader);
+            shadermode.draw_circle(position_xy, circle.radius, circle.color);
         }
     }
 }

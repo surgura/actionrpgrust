@@ -38,7 +38,7 @@ fn main() {
         let mut target = RenderTarget::new(&mut draw_handle);
         target.clear_background(Color::WHITE);
 
-        let camera_pos: Vector2<f32> = Vector2::new(320.0, 240.0);
+        let camera_pos: Vector2<f32> = Vector2::new(-320.0, 240.0);
         let mut sprites3d = RenderTarget3DSprites::new(&mut target, &mut shader2d3d, camera_pos);
         player.draw(&mut sprites3d);
         sprites3d.draw_circle(Vector3::new(0.0, 0.0, 0.0), 64.0, Color::RED);
