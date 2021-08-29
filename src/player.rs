@@ -22,16 +22,16 @@ impl Player {
     }
 
     pub fn update(&mut self, input: &Input) {
-        if input.is_key_down(KeyboardKey::KEY_W) {
+        if input.is_key_down(KeyboardKey::KEY_UP) {
             self.position[1] += 1.0;
         }
-        if input.is_key_down(KeyboardKey::KEY_S) {
+        if input.is_key_down(KeyboardKey::KEY_DOWN) {
             self.position[1] -= 1.0;
         }
-        if input.is_key_down(KeyboardKey::KEY_A) {
+        if input.is_key_down(KeyboardKey::KEY_LEFT) {
             self.position[0] -= 1.0;
         }
-        if input.is_key_down(KeyboardKey::KEY_D) {
+        if input.is_key_down(KeyboardKey::KEY_RIGHT) {
             self.position[0] += 1.0;
         }
         if input.is_key_down(KeyboardKey::KEY_R) {
@@ -41,10 +41,8 @@ impl Player {
             self.position[2] -= 1.0;
         }
 
-        if input.is_key_pressed(KeyboardKey::KEY_SPACE) {
-            self.left_foot_animation_state += 1;
-            self.left_foot_animation_state %= 3;
-        }
+        // Attack
+        if input.is_key_pressed(KeyboardKey::KEY_SPACE) {}
 
         self.anim_timer += 1;
         if self.anim_timer >= 8 {

@@ -16,6 +16,11 @@ pub use render_target_3dsprites::RenderTarget3DSprites;
 mod shader;
 pub use shader::Shader;
 
+mod target_dummy;
+pub use target_dummy::TargetDummy;
+
+mod physics;
+
 use nalgebra::{Vector2, Vector3};
 
 fn main() {
@@ -28,7 +33,12 @@ fn main() {
             .unwrap(),
     };
 
+    let mut phys = physics::Environment::new();
+    let object1 = phys.new_object(physics::BoundingBox::new());
+
     let mut player = Player::new();
+
+    let target_dummy = TargetDummy::new();
 
     while !rl.window_should_close() {
         let input = Input::new(&rl);
@@ -41,6 +51,6 @@ fn main() {
         let camera_pos: Vector2<f32> = Vector2::new(-320.0, 240.0);
         let mut sprites3d = RenderTarget3DSprites::new(&mut target, &mut shader2d3d, camera_pos);
         player.draw(&mut sprites3d);
-        sprites3d.draw_circle(Vector3::new(0.0, 0.0, 0.0), 64.0, Color::RED);
+        target_dummy.draw(&mut sprites3d);
     }
 }
