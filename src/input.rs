@@ -14,4 +14,8 @@ impl<'a> Input<'a> {
     pub fn is_key_down(&self, key: KeyboardKey) -> bool {
         self.handle.is_key_down(key)
     }
+
+    pub fn is_key_pressed(&self, key: KeyboardKey) -> bool {
+        self.handle.is_key_pressed(key)
+    }
 }
