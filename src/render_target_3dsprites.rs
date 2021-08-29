@@ -8,11 +8,18 @@ pub struct RenderTarget3DSprites<'a, 'b, 'c> {
     shader: &'c mut Shader,
     camera_pos: Vector2<f32>,
     drawn_circles: Vec<DrawnCircle>,
+    drawn_rectangles: Vec<DrawnRectangle>,
 }
 
 struct DrawnCircle {
     position: Vector3<f32>,
     radius: f32,
+    color: Color,
+}
+
+struct DrawnRectangle {
+    position: Vector3<f32>,
+    size: Vector2<f32>,
     color: Color,
 }
 
@@ -27,6 +34,7 @@ impl<'a, 'b, 'c> RenderTarget3DSprites<'a, 'b, 'c> {
             shader,
             camera_pos,
             drawn_circles: Vec::new(),
+            drawn_rectangles: Vec::new(),
         }
     }
 
@@ -34,6 +42,14 @@ impl<'a, 'b, 'c> RenderTarget3DSprites<'a, 'b, 'c> {
         self.drawn_circles.push(DrawnCircle {
             position,
             radius,
+            color,
+        })
+    }
+
+    pub fn draw_rectangle(&mut self, position: Vector3<f32>, size: Vector2<f32>, color: Color) {
+        self.drawn_rectangles.push(DrawnRectangle {
+            position,
+            size,
             color,
         })
     }
@@ -56,6 +72,25 @@ impl<'a, 'b, 'c> RenderTarget3DSprites<'a, 'b, 'c> {
             );
             let mut shadermode = self.render_target.begin_shader_mode(&self.shader);
             shadermode.draw_circle(position_xy, circle.radius, circle.color);
+        }
+
+        for rectangle in &self.drawn_rectangles {
+            let mut position_xy = rectangle.position.fixed_rows::<2>(0).into_owned();
+            position_xy[1] += rectangle.size[1];
+            position_xy[1] += rectangle.position[2];
+            position_xy -= self.camera_pos;
+            position_xy[1] = -position_xy[1];
+
+            self.shader.raylib_shader.set_shader_value(
+                0,
+                [
+                    rectangle.position[0],
+                    rectangle.position[1],
+                    rectangle.position[2],
+                ],
+            );
+            let mut shadermode = self.render_target.begin_shader_mode(&self.shader);
+            shadermode.draw_rectangle(position_xy, rectangle.size, rectangle.color);
         }
     }
 }

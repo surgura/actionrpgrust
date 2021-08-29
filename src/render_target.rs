@@ -26,6 +26,16 @@ impl<'a, 'b> RenderTarget<'a, 'b> {
         );
     }
 
+    pub fn draw_rectangle(&mut self, position: Vector2<f32>, size: Vector2<f32>, color: Color) {
+        self.handle.draw_rectangle(
+            position[0].round() as i32,
+            position[1].round() as i32,
+            size[0].round() as i32,
+            size[1].round() as i32,
+            color,
+        )
+    }
+
     #[must_use]
     pub fn begin_shader_mode<'s>(&'s mut self, shader: &'s Shader) -> ShaderMode<'s, 'b> {
         ShaderMode {
@@ -46,5 +56,15 @@ impl<'a, 'b> ShaderMode<'a, 'b> {
             radius,
             color,
         );
+    }
+
+    pub fn draw_rectangle(&mut self, position: Vector2<f32>, size: Vector2<f32>, color: Color) {
+        self.raylib_shader_mode.draw_rectangle(
+            position[0].round() as i32,
+            position[1].round() as i32,
+            size[0].round() as i32,
+            size[1].round() as i32,
+            color,
+        )
     }
 }
