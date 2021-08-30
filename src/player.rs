@@ -5,7 +5,7 @@ use super::input::*;
 use super::render_target_3dsprites::RenderTarget3DSprites;
 
 pub struct Player {
-    position: Vector3<f32>,
+    pub position: Vector3<f32>,
     left_foot_animation_state: u32,
     anim_timer: u32,
     left_foot_pos: Vector3<f32>,

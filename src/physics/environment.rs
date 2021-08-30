@@ -1,29 +1,56 @@
 use super::bounding_box::BoundingBox;
 use super::object::{Object, ObjectImpl};
+use nalgebra::Vector3;
 use std::cell::RefCell;
 use std::rc::Rc;
 
 pub struct Environment {
-    inner: RefCell<EnvironmentImpl>,
+    inner: Rc<RefCell<EnvironmentImpl>>,
 }
 
 impl Environment {
     pub fn new() -> Environment {
         Environment {
-            inner: RefCell::new(EnvironmentImpl::new()),
+            inner: Rc::new(RefCell::new(EnvironmentImpl::new())),
         }
     }
 
     /// Add an object to the environment.
     /// Remains in the environment until returned object ref drops.
-    pub fn new_object<'a>(&'a mut self, bounding_box: BoundingBox) -> Object<'a> {
+    pub fn new_object(&mut self, bounding_box: BoundingBox) -> Object {
         let object = self.inner.borrow_mut().new_object(bounding_box);
-        Object::new(&self.inner, object)
+        Object::new(Rc::clone(&self.inner), object)
     }
 
-    pub fn get_collisions(&self, bounding_box: BoundingBox) -> Vec<u32> {
-        todo!();
-        Vec::new()
+    pub fn get_collisions(&self, bounding_box: BoundingBox, position: Vector3<f32>) -> Vec<u32> {
+        self.inner
+            .borrow()
+            .objects
+            .iter()
+            .filter(|object| {
+                Self::collides(
+                    bounding_box,
+                    position,
+                    object.borrow().bounding_box,
+                    object.borrow().position,
+                )
+            })
+            .map(|object| object.borrow().object_id)
+            .collect()
+    }
+
+    pub fn collides(
+        a_box: BoundingBox,
+        a_position: Vector3<f32>,
+        b_box: BoundingBox,
+        b_position: Vector3<f32>,
+    ) -> bool {
+        return !(a_position[0] - a_box.x > b_position[0] + b_box.x
+            || b_position[0] - b_box.x > a_position[0] + a_box.x
+            || a_position[1] - a_box.y > b_position[1] + b_box.y
+            || b_position[1] - b_box.y > a_position[1] + a_box.y
+            || a_position[2] - a_box.z > b_position[2] + b_box.z
+            || b_position[2] - b_box.z > a_position[2] + a_box.z);
     }
 }
 

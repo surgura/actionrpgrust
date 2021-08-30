@@ -34,7 +34,8 @@ fn main() {
     };
 
     let mut phys = physics::Environment::new();
-    let object1 = phys.new_object(physics::BoundingBox::new());
+    let object1 = phys.new_object(physics::BoundingBox::new(16.0, 16.0, 1.0));
+    let object2 = phys.new_object(physics::BoundingBox::new(16.0, 16.0, 1.0));
 
     let mut player = Player::new();
 
@@ -43,6 +44,11 @@ fn main() {
     while !rl.window_should_close() {
         let input = Input::new(&rl);
         player.update(&input);
+        println!(
+            "{}",
+            phys.get_collisions(physics::BoundingBox::new(16.0, 16.0, 1.0), player.position)
+                .len()
+        );
 
         let mut draw_handle = rl.begin_drawing(&thread);
         let mut target = RenderTarget::new(&mut draw_handle);

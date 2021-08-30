@@ -4,16 +4,16 @@ use nalgebra::Vector3;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-pub struct Object<'a> {
-    environment: &'a RefCell<EnvironmentImpl>,
+pub struct Object {
+    environment: Rc<RefCell<EnvironmentImpl>>,
     inner: Rc<RefCell<ObjectImpl>>,
 }
 
-impl<'a> Object<'a> {
+impl Object {
     pub fn new(
-        environment: &'a RefCell<EnvironmentImpl>,
+        environment: Rc<RefCell<EnvironmentImpl>>,
         inner: Rc<RefCell<ObjectImpl>>,
-    ) -> Object<'a> {
+    ) -> Object {
         Self { environment, inner }
     }
 
@@ -26,7 +26,7 @@ impl<'a> Object<'a> {
     }
 }
 
-impl<'a> Drop for Object<'a> {
+impl Drop for Object {
     fn drop(&mut self) {
         self.environment
             .borrow_mut()
@@ -35,9 +35,9 @@ impl<'a> Drop for Object<'a> {
 }
 
 pub struct ObjectImpl {
-    object_id: u32,
-    position: Vector3<f32>,
-    bounding_box: BoundingBox,
+    pub object_id: u32,
+    pub position: Vector3<f32>,
+    pub bounding_box: BoundingBox,
 }
 
 impl ObjectImpl {
