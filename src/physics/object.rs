@@ -24,6 +24,10 @@ impl Object {
     pub fn set_position(&mut self, new_position: Vector3<f32>) {
         self.inner.borrow_mut().position = new_position;
     }
+
+    pub fn set_velocity(&mut self, new_velocity: Vector3<f32>) {
+        self.inner.borrow_mut().velocity = new_velocity;
+    }
 }
 
 impl Drop for Object {
@@ -38,6 +42,7 @@ pub struct ObjectImpl {
     pub object_id: u32,
     pub position: Vector3<f32>,
     pub bounding_box: BoundingBox,
+    pub velocity: Vector3<f32>,
 }
 
 impl ObjectImpl {
@@ -46,6 +51,7 @@ impl ObjectImpl {
             object_id,
             position: Vector3::new(0.0, 0.0, 0.0),
             bounding_box,
+            velocity: Vector3::new(0.0, 0.0, 0.0),
         }
     }
 }

@@ -34,7 +34,9 @@ fn main() {
     };
 
     let mut phys = physics::Environment::new();
-    let object1 = phys.new_object(physics::BoundingBox::new(16.0, 16.0, 1.0));
+    let mut object1 = phys.new_object(physics::BoundingBox::new(16.0, 16.0, 1.0));
+    object1.set_position(Vector3::new(-300.0, 0.0, 0.0));
+    object1.set_velocity(Vector3::new(1.0, 0.0, 0.0));
     let object2 = phys.new_object(physics::BoundingBox::new(16.0, 16.0, 1.0));
 
     let mut player = Player::new();
@@ -44,11 +46,8 @@ fn main() {
     while !rl.window_should_close() {
         let input = Input::new(&rl);
         player.update(&input);
-        println!(
-            "{}",
-            phys.get_collisions(physics::BoundingBox::new(16.0, 16.0, 1.0), player.position)
-                .len()
-        );
+
+        phys.step();
 
         let mut draw_handle = rl.begin_drawing(&thread);
         let mut target = RenderTarget::new(&mut draw_handle);
@@ -58,5 +57,6 @@ fn main() {
         let mut sprites3d = RenderTarget3DSprites::new(&mut target, &mut shader2d3d, camera_pos);
         player.draw(&mut sprites3d);
         target_dummy.draw(&mut sprites3d);
+        sprites3d.draw_circle(object1.get_position(), 100.0f32, Color::BLUE);
     }
 }
