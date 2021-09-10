@@ -3,7 +3,7 @@ use super::collision::Collision;
 use super::object::{Object, ObjectImpl};
 use nalgebra::Vector3;
 use std::cell::RefCell;
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
 
 pub struct Environment {
@@ -29,7 +29,7 @@ impl Environment {
             .borrow()
             .objects
             .iter()
-            .filter(|object| {
+            .filter(|(_, object)| {
                 Self::collides(
                     bounding_box,
                     position,
@@ -37,7 +37,7 @@ impl Environment {
                     object.borrow().position,
                 )
             })
-            .map(|object| object.borrow().object_id)
+            .map(|(_, object)| object.borrow().object_id)
             .collect()
     }
 
@@ -61,12 +61,12 @@ impl Environment {
         let mut should_move: Vec<bool> = Vec::new();
         let mut all_collisions: HashSet<Collision> = HashSet::new();
 
-        for object1 in &inner.objects {
+        for (_, object1) in &inner.objects {
             let o1 = object1.borrow();
             let collisions: Vec<u32> = inner
                 .objects
                 .iter()
-                .filter(|object2| {
+                .filter(|(_, object2)| {
                     o1.object_id != object2.borrow().object_id
                         && Self::collides(
                             o1.bounding_box,
@@ -75,7 +75,7 @@ impl Environment {
                             object2.borrow().position + object2.borrow().velocity,
                         )
                 })
-                .map(|object| object.borrow().object_id)
+                .map(|(_, object2)| object2.borrow().object_id)
                 .collect();
             if collisions.len() == 0 {
                 should_move.push(true);
@@ -88,7 +88,7 @@ impl Environment {
         }
 
         for iter in inner.objects.iter_mut().zip(should_move.iter()) {
-            let (object, do_move) = iter;
+            let ((_, object), do_move) = iter;
             if *do_move {
                 let mut borrowed = object.borrow_mut();
                 borrowed.position = borrowed.position + borrowed.velocity;
@@ -101,25 +101,26 @@ impl Environment {
 
 pub struct EnvironmentImpl {
     // TODO this datastructure can be significantly improved
-    objects: Vec<Rc<RefCell<ObjectImpl>>>,
+    objects: HashMap<u32, Rc<RefCell<ObjectImpl>>>,
 }
 
 impl EnvironmentImpl {
     pub fn new() -> EnvironmentImpl {
         EnvironmentImpl {
-            objects: Vec::new(),
+            objects: HashMap::new(),
         }
     }
 
     fn new_object(&mut self, bounding_box: BoundingBox) -> Rc<RefCell<ObjectImpl>> {
-        self.objects.push(Rc::new(RefCell::new(ObjectImpl::new(
-            self.objects.len() as u32,
-            bounding_box,
-        ))));
-        Rc::clone(self.objects.last().unwrap())
+        let new_id = self.objects.len() as u32;
+        self.objects.insert(
+            new_id,
+            Rc::new(RefCell::new(ObjectImpl::new(new_id, bounding_box))),
+        );
+        Rc::clone(self.objects.get(&new_id).unwrap())
     }
 
     pub fn remove_object(&mut self, object_id: u32) {
-        todo!();
+        self.objects.remove(&object_id);
     }
 }
