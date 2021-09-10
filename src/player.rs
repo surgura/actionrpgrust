@@ -2,19 +2,20 @@ use nalgebra::Vector3;
 
 use super::color::Color;
 use super::input::*;
+use super::physics;
 use super::render_target_3dsprites::RenderTarget3DSprites;
 
 pub struct Player {
-    pub position: Vector3<f32>,
+    phys_obj: physics::Object,
     left_foot_animation_state: u32,
     anim_timer: u32,
     left_foot_pos: Vector3<f32>,
 }
 
 impl Player {
-    pub fn new() -> Player {
+    pub fn new(phys: &mut physics::Environment) -> Player {
         Player {
-            position: Vector3::new(100.0, 0.0, 0.0),
+            phys_obj: phys.new_object(physics::BoundingBox::new(16.0, 16.0, 1.0)),
             left_foot_animation_state: 0,
             anim_timer: 0,
             left_foot_pos: Vector3::new(0.0, 0.0, 0.0),
@@ -22,27 +23,28 @@ impl Player {
     }
 
     pub fn update(&mut self, input: &Input) {
+        let mut new_velocity = Vector3::new(0.0, 0.0, 0.0);
         if input.is_key_down(KeyboardKey::KEY_UP) {
-            self.position[1] += 1.0;
+            new_velocity[1] += 1.0;
         }
         if input.is_key_down(KeyboardKey::KEY_DOWN) {
-            self.position[1] -= 1.0;
+            new_velocity[1] -= 1.0;
         }
         if input.is_key_down(KeyboardKey::KEY_LEFT) {
-            self.position[0] -= 1.0;
+            new_velocity[0] -= 1.0;
         }
         if input.is_key_down(KeyboardKey::KEY_RIGHT) {
-            self.position[0] += 1.0;
+            new_velocity[0] += 1.0;
         }
         if input.is_key_down(KeyboardKey::KEY_R) {
-            self.position[2] += 1.0;
+            self.phys_obj
+                .set_position(self.phys_obj.get_position() + Vector3::new(0.0, 0.0, 1.0));
         }
         if input.is_key_down(KeyboardKey::KEY_F) {
-            self.position[2] -= 1.0;
+            self.phys_obj
+                .set_position(self.phys_obj.get_position() + Vector3::new(0.0, 0.0, -1.0));
         }
-
-        // Attack
-        if input.is_key_pressed(KeyboardKey::KEY_SPACE) {}
+        self.phys_obj.set_velocity(new_velocity);
 
         self.anim_timer += 1;
         if self.anim_timer >= 8 {
@@ -71,16 +73,17 @@ impl Player {
     }
 
     pub fn draw(&self, target: &mut RenderTarget3DSprites) {
-        target.draw_circle(
-            self.position + Vector3::new(0.0, 0.0, 12.0),
+        /*target.draw_circle(
+            self.phys_obj.get_position() + Vector3::new(0.0, 0.0, 12.0),
             16.0,
             Color::PURPLE,
         );
-        target.draw_circle(self.position + self.left_foot_pos, 8.0, Color::GREEN);
-        /*target.draw_circle(
-            self.position + Vector3::new(8.0, 0.0, 0.0),
+        target.draw_circle(
+            self.phys_obj.get_position() + self.left_foot_pos,
             8.0,
             Color::GREEN,
         );*/
+
+        target.draw_circle(self.phys_obj.get_position(), 16.0, Color::GREEN);
     }
 }

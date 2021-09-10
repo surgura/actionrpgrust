@@ -35,11 +35,10 @@ fn main() {
 
     let mut phys = physics::Environment::new();
     let mut object1 = phys.new_object(physics::BoundingBox::new(16.0, 16.0, 1.0));
-    object1.set_position(Vector3::new(-300.0, 0.0, 0.0));
-    object1.set_velocity(Vector3::new(1.0, 0.0, 0.0));
-    let object2 = phys.new_object(physics::BoundingBox::new(16.0, 16.0, 1.0));
+    object1.set_position(Vector3::new(-100.0, 0.0, 0.0));
+    //object1.set_velocity(Vector3::new(1.0, 0.0, 0.0));
 
-    let mut player = Player::new();
+    let mut player = Player::new(&mut phys);
 
     let target_dummy = TargetDummy::new();
 
@@ -56,7 +55,7 @@ fn main() {
         let camera_pos: Vector2<f32> = Vector2::new(-320.0, 240.0);
         let mut sprites3d = RenderTarget3DSprites::new(&mut target, &mut shader2d3d, camera_pos);
         player.draw(&mut sprites3d);
-        target_dummy.draw(&mut sprites3d);
-        sprites3d.draw_circle(object1.get_position(), 100.0f32, Color::BLUE);
+        //target_dummy.draw(&mut sprites3d);
+        sprites3d.draw_circle(object1.get_position(), 16.0f32, Color::BLUE);
     }
 }
